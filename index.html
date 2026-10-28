@@ -1,0 +1,2635 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>LED Display & Video Wall Engineering Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #EDF1F5;
+      --surface: #F9FBFC;
+      --surface-sub: #F0F4F8;
+      --line: #D3DBE4;
+      --ink: #0F1B2D;
+      --muted: #55657A;
+      --accent: #0A7C86;
+      --accent-hover: #08666E;
+      --accent-ink: #FFFFFF;
+      --accent-light: #E0F5F5;
+      --chip: #E3EAF1;
+      --chip-hover: #D5E0EB;
+      --chip-active: #0A7C86;
+      --chip-active-ink: #FFFFFF;
+      --tag-indoor: #0D8253;
+      --tag-indoor-bg: #E4F7EC;
+      --tag-outdoor: #B45309;
+      --tag-outdoor-bg: #FEF3C7;
+      --font-body: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-num: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+      --radius: 8px;
+      --shadow: 0 1px 3px rgba(15, 27, 45, 0.06), 0 1px 2px rgba(15, 27, 45, 0.04);
+    }
+
+    [data-theme="dark"] {
+      --bg: #0B121C;
+      --surface: #121C29;
+      --surface-sub: #172435;
+      --line: #26354A;
+      --ink: #E6EDF5;
+      --muted: #93A4B8;
+      --accent: #3CC9C0;
+      --accent-hover: #52D8CF;
+      --accent-ink: #06222B;
+      --accent-light: #103338;
+      --chip: #1B2A3C;
+      --chip-hover: #24374E;
+      --chip-active: #3CC9C0;
+      --chip-active-ink: #06222B;
+      --tag-indoor: #34D399;
+      --tag-indoor-bg: #064E3B;
+      --tag-outdoor: #FBBF24;
+      --tag-outdoor-bg: #78350F;
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0B121C;
+        --surface: #121C29;
+        --surface-sub: #172435;
+        --line: #26354A;
+        --ink: #E6EDF5;
+        --muted: #93A4B8;
+        --accent: #3CC9C0;
+        --accent-hover: #52D8CF;
+        --accent-ink: #06222B;
+        --accent-light: #103338;
+        --chip: #1B2A3C;
+        --chip-hover: #24374E;
+        --chip-active: #3CC9C0;
+        --chip-active-ink: #06222B;
+        --tag-indoor: #34D399;
+        --tag-indoor-bg: #064E3B;
+        --tag-outdoor: #FBBF24;
+        --tag-outdoor-bg: #78350F;
+        --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.5;
+      margin: 0;
+      padding: 24px 16px 64px;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Header & Top Bar */
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .brand-title {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .badge-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .badge {
+      font-family: var(--font-num);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--chip);
+      color: var(--muted);
+      border: 1px solid var(--line);
+    }
+    .badge.pro {
+      background: var(--accent-light);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(26px, 4vw, 36px);
+      line-height: 1.15;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .sub {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      max-width: 65ch;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn:hover {
+      background: var(--chip);
+      border-color: var(--muted);
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--accent-ink);
+      border-color: var(--accent);
+    }
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+
+    /* Panels */
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: var(--shadow);
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .panel-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .panel-title svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+    }
+
+    /* Layout Grids */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .grid-1-2 {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 992px) {
+      .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid-1-2, .grid-3 { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 680px) {
+      .grid-2, .grid-4 { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    /* Form Fields & Clean Modern Stepper Input Groups (NO OVERLAPPING!) */
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .label-hint {
+      font-weight: 400;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* Partitioned Input Group */
+    .input-wrap {
+      display: flex;
+      align-items: stretch;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .input-wrap:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-light);
+    }
+    .input-wrap input[type="number"], .input-wrap input[type="text"] {
+      flex: 1;
+      width: 100%;
+      min-width: 0;
+      font-family: var(--font-num);
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--ink);
+      background: transparent;
+      border: none;
+      padding: 8px 12px;
+      font-variant-numeric: tabular-nums;
+      outline: none;
+    }
+    /* Hide native buggy browser spin buttons that overlap with text */
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+
+    select {
+      width: 100%;
+      font-size: 14px;
+      font-family: var(--font-body);
+      color: var(--ink);
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 9px 28px 9px 12px;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    select:focus {
+      border-color: var(--accent);
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+
+    /* Clean, Dedicated Up/Down Steppers (Separate from text!) */
+    .step-btns {
+      display: flex;
+      flex-direction: column;
+      width: 24px;
+      border-left: 1px solid var(--line);
+      background: var(--surface-sub);
+      user-select: none;
+    }
+    .step-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      line-height: 1;
+      transition: background 0.12s, color 0.12s;
+    }
+    .step-btn:hover {
+      background: var(--chip);
+      color: var(--ink);
+    }
+    .step-btn:active {
+      background: var(--accent);
+      color: var(--accent-ink);
+    }
+    .step-btn.up {
+      border-bottom: 1px solid var(--line);
+    }
+
+    /* Unit Suffix Badge - Clean & Completely Separated */
+    .unit {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 12px;
+      background: var(--chip);
+      border-left: 1px solid var(--line);
+      color: var(--muted);
+      font-family: var(--font-num);
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Preset Chips */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .chip {
+      font-family: var(--font-num);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--ink);
+      background: var(--chip);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 5px 9px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .chip:hover {
+      background: var(--chip-hover);
+      border-color: var(--muted);
+    }
+    .chip[aria-pressed="true"], .chip.active {
+      background: var(--chip-active);
+      color: var(--chip-active-ink);
+      border-color: var(--chip-active);
+      font-weight: 600;
+    }
+    .chip.highlight-special {
+      background: linear-gradient(135deg, var(--accent) 0%, #0d9488 100%);
+      color: #FFFFFF;
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* Segmented Controls */
+    .segmented {
+      display: flex;
+      background: var(--bg);
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      gap: 2px;
+    }
+    .seg-btn {
+      flex: 1;
+      text-align: center;
+      padding: 7px 11px;
+      font-size: 12px;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .seg-btn.active {
+      background: var(--surface);
+      color: var(--ink);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .seg-btn.indoor-active {
+      background: var(--tag-indoor);
+      color: #FFFFFF;
+    }
+    .seg-btn.outdoor-active {
+      background: var(--tag-outdoor);
+      color: #FFFFFF;
+    }
+
+    /* Readout KPI Metric Cards */
+    .metric-card {
+      background: var(--surface-sub);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+    .metric-card.accent {
+      border-left: 4px solid var(--accent);
+      background: linear-gradient(to right, var(--accent-light) 0%, var(--surface-sub) 100%);
+    }
+    .metric-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .metric-val {
+      font-family: var(--font-num);
+      font-size: clamp(20px, 2.5vw, 26px);
+      font-weight: 600;
+      line-height: 1.2;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+      word-break: break-all;
+    }
+    .metric-val.highlight {
+      color: var(--accent);
+    }
+    .metric-sub {
+      font-family: var(--font-num);
+      font-size: 12px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Dot Preview & Aspect Ratio Visualizer */
+    .dots-box {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--bg);
+      height: 90px;
+      overflow: hidden;
+      position: relative;
+    }
+    .dots-preview {
+      width: 100%;
+      height: 100%;
+      --gap: 20px;
+      background-image: radial-gradient(circle, var(--accent) 26%, transparent 30%);
+      background-size: var(--gap) var(--gap);
+      background-position: center;
+    }
+    .dots-tag {
+      position: absolute;
+      bottom: 6px;
+      right: 8px;
+      font-family: var(--font-num);
+      font-size: 11px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--muted);
+    }
+
+    /* Screen Canvas & Visualizer */
+    .screen-visual-box {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--bg);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 180px;
+      position: relative;
+    }
+    .canvas-container {
+      width: 100%;
+      max-width: 480px;
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    svg.screen-svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+
+    /* Interactive Distance Diagram */
+    .distance-diagram-box {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--bg);
+      padding: 16px;
+      position: relative;
+      overflow-x: auto;
+    }
+    .dist-track {
+      position: relative;
+      height: 60px;
+      margin: 20px 20px 30px;
+      border-bottom: 2px dashed var(--line);
+    }
+    .dist-marker {
+      position: absolute;
+      bottom: 0;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: none;
+    }
+    .dist-pin {
+      width: 2px;
+      height: 20px;
+      background: var(--muted);
+    }
+    .dist-pin.accent {
+      background: var(--accent);
+      height: 28px;
+      width: 3px;
+    }
+    .dist-tag {
+      font-family: var(--font-num);
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      margin-top: 4px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+    }
+    .dist-tag.accent {
+      background: var(--accent);
+      color: var(--accent-ink);
+      border-color: var(--accent);
+    }
+
+    /* Table Styles (Matching the uploaded Spec Sheet) */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface);
+    }
+    table.spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+      text-align: left;
+    }
+    table.spec-table th, table.spec-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      white-space: nowrap;
+    }
+    table.spec-table th:last-child, table.spec-table td:last-child {
+      border-right: none;
+    }
+    table.spec-table thead tr {
+      background: var(--surface-sub);
+    }
+    table.spec-table thead th {
+      font-family: var(--font-num);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    table.spec-table thead th.current-col {
+      background: var(--accent-light);
+      color: var(--accent);
+      border-bottom: 2px solid var(--accent);
+    }
+    table.spec-table td.current-col {
+      background: var(--accent-light);
+      font-weight: 600;
+    }
+    .table-sec-header {
+      background: var(--chip) !important;
+      font-weight: 700;
+      color: var(--ink);
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+    }
+    .table-prop-title {
+      font-weight: 500;
+      color: var(--muted);
+      width: 260px;
+    }
+
+    /* Collapsible / Details */
+    details {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface);
+      overflow: hidden;
+    }
+    summary {
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      background: var(--surface-sub);
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after {
+      content: '+';
+      font-family: var(--font-num);
+      font-size: 16px;
+      font-weight: 700;
+    }
+    details[open] summary::after {
+      content: '−';
+    }
+    .details-content {
+      padding: 16px;
+      border-top: 1px solid var(--line);
+    }
+
+    /* Informational Notes & Badges */
+    .note-box {
+      font-size: 13px;
+      color: var(--muted);
+      background: var(--chip);
+      border-left: 3px solid var(--accent);
+      padding: 10px 14px;
+      border-radius: 0 6px 6px 0;
+      line-height: 1.5;
+    }
+    .badge-env {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font-num);
+    }
+    .badge-indoor {
+      background: var(--tag-indoor-bg);
+      color: var(--tag-indoor);
+      border: 1px solid var(--tag-indoor);
+    }
+    .badge-outdoor {
+      background: var(--tag-outdoor-bg);
+      color: var(--tag-outdoor);
+      border: 1px solid var(--tag-outdoor);
+    }
+
+    /* Range sliders */
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--line);
+      outline: none;
+      margin: 8px 0;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      transition: transform 0.1s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--line);
+      padding-top: 20px;
+      color: var(--muted);
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    @media print {
+      body { background: #fff !important; color: #000 !important; padding: 0 !important; }
+      .header-actions, .chips, input, select, .segmented, .step-btns { display: none !important; }
+      .panel { box-shadow: none !important; border: 1px solid #ccc !important; break-inside: avoid; }
+      .spec-table { font-size: 11px !important; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <!-- Top App Header -->
+  <header class="top-header">
+    <div class="brand-title">
+      <div class="badge-bar">
+        <span class="badge pro">Display Engineering Suite</span>
+        <span id="envBadge" class="badge-env badge-indoor">● Indoor Profile</span>
+        <span class="badge" id="aspectBadge">16:9 UHD Compatible</span>
+      </div>
+      <h1>LED Video Wall Engineering Calculator</h1>
+      <p class="sub">Complete interactive sizing, diagonal screen inch calculator, optical criteria, power calculation, pixel density, viewing distance, and comprehensive engineering datasheet generator.</p>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="btn" id="themeToggle" title="Toggle Light/Dark Theme">
+        <span id="themeIcon">🌙</span> <span id="themeText">Dark Mode</span>
+      </button>
+      <button type="button" class="btn btn-primary" onclick="window.print()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        Print / PDF Export
+      </button>
+    </div>
+  </header>
+
+  <!-- Quick Model Presets from Datasheet -->
+  <section class="panel" style="padding: 16px 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+      <span style="font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em;">
+        Quick Model & All-in-One Presets:
+      </span>
+      <div class="chips" id="modelChips">
+        <button type="button" class="chip highlight-special" id="btnPresetAIO136">★ 136″ AIO Wall (1.5mm - 5×5)</button>
+        <button type="button" class="chip active" data-model="FM2709">FM2709 (P0.93 - MIP)</button>
+        <button type="button" class="chip" data-model="FM2712">FM2712 (P1.25 - MIP)</button>
+        <button type="button" class="chip" data-model="FC2712">FC2712 (P1.25 - 1R1G1B)</button>
+        <button type="button" class="chip" data-model="FC2715">FC2715 (P1.56 - 1R1G1B)</button>
+        <button type="button" class="chip" data-model="FS2718">FS2718 (P1.87 - TOP1515)</button>
+        <button type="button" class="chip" data-model="FS2725">FS2725 (P2.50 - TOP2121)</button>
+        <button type="button" class="chip" data-model="OUT39">Outdoor P3.91 (5500 nit)</button>
+        <button type="button" class="chip" data-model="OUT60">Outdoor P6.0 (6550 nit)</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 1: Pitch & Physical Sizing -->
+  <div class="grid-2">
+    <!-- Left Column: Inputs & Pitch -->
+    <section class="panel">
+      <div class="panel-header">
+        <span class="panel-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          1. Pixel Pitch & Cabinet Dimensions
+        </span>
+        <div class="segmented" style="width: 210px;">
+          <button type="button" class="seg-btn indoor-active" id="btnIndoor">Indoor</button>
+          <button type="button" class="seg-btn" id="btnOutdoor">Outdoor</button>
+        </div>
+      </div>
+
+      <!-- Pixel Pitch Field -->
+      <div class="field">
+        <label for="pitch">
+          <span>Pixel Pitch</span>
+          <span class="label-hint">Diode center-to-center spacing</span>
+        </label>
+        <div class="input-wrap">
+          <input id="pitch" type="number" inputmode="decimal" step="0.1" min="0.5" max="25" value="0.9375">
+          <div class="step-btns">
+            <button type="button" class="step-btn up" aria-label="Increase pitch">▲</button>
+            <button type="button" class="step-btn down" aria-label="Decrease pitch">▼</button>
+          </div>
+          <span class="unit">mm</span>
+        </div>
+        <div class="chips" id="pitchChips">
+          <button type="button" class="chip" data-p="0.9375">P0.93</button>
+          <button type="button" class="chip" data-p="1.25">P1.25</button>
+          <button type="button" class="chip" data-p="1.5">P1.50</button>
+          <button type="button" class="chip" data-p="1.5625">P1.56</button>
+          <button type="button" class="chip" data-p="1.875">P1.87</button>
+          <button type="button" class="chip" data-p="2.5">P2.5</button>
+          <button type="button" class="chip" data-p="3.0">P3.0</button>
+          <button type="button" class="chip" data-p="3.91">P3.91</button>
+          <button type="button" class="chip" data-p="4.81">P4.81</button>
+          <button type="button" class="chip" data-p="6.0">P6.0</button>
+          <button type="button" class="chip" data-p="10.0">P10</button>
+        </div>
+      </div>
+
+      <!-- Diode Dot Matrix Zoom -->
+      <div class="dots-box" aria-hidden="true">
+        <div class="dots-preview" id="dotsPreview"></div>
+        <div class="dots-tag" id="dotsTag">P0.9375 mm scale preview</div>
+      </div>
+
+      <!-- Cabinet & Module Spec -->
+      <div class="grid-2">
+        <div class="field">
+          <label for="cabWidth">Cabinet Width</label>
+          <div class="input-wrap">
+            <input id="cabWidth" type="number" step="10" value="600">
+            <div class="step-btns">
+              <button type="button" class="step-btn up">▲</button>
+              <button type="button" class="step-btn down">▼</button>
+            </div>
+            <span class="unit">mm</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="cabHeight">Cabinet Height</label>
+          <div class="input-wrap">
+            <input id="cabHeight" type="number" step="10" value="337.5">
+            <div class="step-btns">
+              <button type="button" class="step-btn up">▲</button>
+              <button type="button" class="step-btn down">▼</button>
+            </div>
+            <span class="unit">mm</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="cabWeight">Cabinet Weight</label>
+          <div class="input-wrap">
+            <input id="cabWeight" type="number" step="0.1" value="3.4">
+            <div class="step-btns">
+              <button type="button" class="step-btn up">▲</button>
+              <button type="button" class="step-btn down">▼</button>
+            </div>
+            <span class="unit">kg</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="cabMaterial">Cabinet Material</label>
+          <select id="cabMaterial">
+            <option value="Die-cast magnesium-aluminum">Die-cast Magnesium-Alu (16:9)</option>
+            <option value="Die-cast aluminum">Die-cast Aluminum</option>
+            <option value="Sheet metal iron">Iron Steel Cabinet (Outdoor)</option>
+            <option value="Carbon fiber">Carbon Fiber (Ultra-light)</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: Screen Wall Dimensions & Layout Builder -->
+    <section class="panel">
+      <div class="panel-header">
+        <span class="panel-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+          2. Screen Wall Sizing & Diagonal Calculator
+        </span>
+        <!-- 3 Sizing Modes: By Cabinets, By Dimensions, By Diagonal -->
+        <div class="segmented" style="width: 340px;">
+          <button type="button" class="seg-btn active" id="modeCabinets">By Cabinets</button>
+          <button type="button" class="seg-btn" id="modeCustomSize">By Total Size</button>
+          <button type="button" class="seg-btn" id="modeDiagonal">By Diagonal (Inch)</button>
+        </div>
+      </div>
+
+      <!-- Mode 1: Cabinet Count Inputs -->
+      <div id="cabinetCountBlock" class="grid-2">
+        <div class="field">
+          <label for="cols">Cabinets Wide (Columns)</label>
+          <div class="input-wrap">
+            <input id="cols" type="number" min="1" max="100" value="8">
+            <div class="step-btns">
+              <button type="button" class="step-btn up">▲</button>
+              <button type="button" class="step-btn down">▼</button>
+            </div>
+            <span class="unit">cols</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="rows">Cabinets High (Rows)</label>
+          <div class="input-wrap">
+            <input id="rows" type="number" min="1" max="100" value="4">
+            <div class="step-btns">
+              <button type="button" class="step-btn up">▲</button>
+              <button type="button" class="step-btn down">▼</button>
+            </div>
+            <span class="unit">rows</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode 2: Dimension Inputs (Active if Custom Size mode) -->
+      <div id="customSizeBlock" class="grid-2" style="display: none;">
+        <div class="field">
+          <label for="wallWidth">Target Width</label>
+          <div class="input-wrap">
+            <input id="wallWidth" type="number" step="100" value="4800">
+            <div class="step-btns">
+              <button type="button" class="step-btn up">▲</button>
+              <button type="button" class="step-btn down">▼</button>
+            </div>
+            <span class="unit">mm</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="wallHeight">Target Height</label>
+          <div class="input-wrap">
+            <input id="wallHeight" type="number" step="100" value="1350">
+            <div class="step-btns">
+              <button type="button" class="step-btn up">▲</button>
+              <button type="button" class="step-btn down">▼</button>
+            </div>
+            <span class="unit">mm</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode 3: Diagonal Screen Size (Inch) Calculator (Active if Diagonal mode) -->
+      <div id="diagonalBlock" style="display: none; flex-direction: column; gap: 12px;">
+        <div class="grid-2">
+          <div class="field">
+            <label for="screenDiagonal">
+              <span>Target Screen Diagonal</span>
+              <span class="label-hint">Standard Video Wall Size</span>
+            </label>
+            <div class="input-wrap">
+              <input id="screenDiagonal" type="number" step="1" min="20" max="1000" value="136">
+              <div class="step-btns">
+                <button type="button" class="step-btn up">▲</button>
+                <button type="button" class="step-btn down">▼</button>
+              </div>
+              <span class="unit">inch</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="diagAspect">
+              <span>Target Aspect Ratio</span>
+              <span class="label-hint">Display Format</span>
+            </label>
+            <select id="diagAspect">
+              <option value="16:9" selected>16:9 Standard Widescreen (All-in-One)</option>
+              <option value="21:9">21:9 Ultra-Wide Cinematic</option>
+              <option value="32:9">32:9 Super Panoramic</option>
+              <option value="4:3">4:3 Legacy Standard</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Standard AIO Diagonal Presets -->
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <span class="hint" style="font-weight: 500;">Popular All-in-One Commercial Sizes:</span>
+          <div class="chips" id="diagChips">
+            <button type="button" class="chip" data-diag="108">108″ (4×4 Cabs)</button>
+            <button type="button" class="chip active" data-diag="136">136″ (5×5 Cabs)</button>
+            <button type="button" class="chip" data-diag="163">163″ (6×6 Cabs)</button>
+            <button type="button" class="chip" data-diag="204">204″ (7×7 Cabs)</button>
+            <button type="button" class="chip" data-diag="217">217″ (8×8 Cabs)</button>
+            <button type="button" class="chip" data-diag="272">272″ (10×10 Cabs)</button>
+          </div>
+        </div>
+
+        <!-- Detailed Diagonal Engineering Analysis Card -->
+        <div class="metric-card" style="background: var(--surface); border: 1px solid var(--accent); padding: 14px 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 8px; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+            <span style="font-weight: 700; font-size: 13px; color: var(--accent); text-transform: uppercase;">
+              📐 Diagonal & Cabinet Count Analysis
+            </span>
+            <span class="badge" id="diagMatchBadge" style="background: var(--accent-light); color: var(--accent); font-weight: 700;">99.6% Match</span>
+          </div>
+          
+          <div class="grid-2" style="font-size: 13px; gap: 10px;">
+            <div>
+              <div style="color: var(--muted); font-size: 11px; text-transform: uppercase; font-weight: 600;">1. Theoretical 136″ Dimensions:</div>
+              <div id="diagTheoSize" style="font-family: var(--font-num); font-size: 13.5px; font-weight: 600; color: var(--ink);">
+                3009.5 mm × 1692.8 mm (Diag: 3454.4 mm)
+              </div>
+            </div>
+            <div>
+              <div style="color: var(--muted); font-size: 11px; text-transform: uppercase; font-weight: 600;">2. Exact Cabinet Division:</div>
+              <div id="diagRawCount" style="font-family: var(--font-num); font-size: 13.5px; font-weight: 600; color: var(--ink);">
+                5.02 W × 5.02 H cabinets
+              </div>
+            </div>
+          </div>
+
+          <!-- Practical Assembly Note -->
+          <div id="diagPracticalNote" style="margin-top: 10px; font-size: 12.5px; line-height: 1.45; background: var(--chip); padding: 9px 12px; border-radius: 6px; border-left: 3px solid var(--accent);">
+            <strong>Practical Assembly:</strong> Exact 136″ requires 5.02 × 5.02 cabinets. Cabinets must be whole integers, so the best practical build is <strong>5 × 5 = 25 cabinets</strong> producing <strong>135.5 inch (3000 × 1687.5 mm)</strong>.
+          </div>
+
+          <!-- Built Resolution Readout -->
+          <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 13px;">
+            <div>
+              <span style="color: var(--muted);">Cabinet Res: </span>
+              <strong id="diagCabRes" style="font-family: var(--font-num); color: var(--ink);">400 × 225 px</strong>
+            </div>
+            <div>
+              <span style="color: var(--muted);">Total Built Wall Res: </span>
+              <strong id="diagWallRes" style="font-family: var(--font-num); color: var(--accent);">2000 × 1125 px (2.25 MP)</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Standard Resolution Preset Chips -->
+      <div id="aspectPresetsRow" style="display: flex; flex-direction: column; gap: 6px;">
+        <span class="hint" style="font-weight: 500;">Standard Aspect Ratio Match:</span>
+        <div class="chips">
+          <button type="button" class="chip" data-preset-wall="16-9-FHD">16:9 1080p FHD</button>
+          <button type="button" class="chip" data-preset-wall="16-9-4K">16:9 4K UHD</button>
+          <button type="button" class="chip" data-preset-wall="21-9">21:9 Ultra-Wide</button>
+          <button type="button" class="chip" data-preset-wall="32-9">32:9 Panoramic</button>
+          <button type="button" class="chip" data-preset-wall="4-3">4:3 Legacy</button>
+        </div>
+      </div>
+
+      <!-- SVG Wall Layout Preview -->
+      <div class="screen-visual-box">
+        <div class="canvas-container" id="svgContainer">
+          <!-- Dynamically generated SVG -->
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Primary Results Bar (Key Readouts) -->
+  <div class="grid-4">
+    <div class="metric-card accent">
+      <div class="metric-label">
+        <span>Total Resolution</span>
+        <span class="badge" id="videoStandardBadge">FHD / 4K</span>
+      </div>
+      <div class="metric-val highlight" id="mTotalRes">5,120 × 1,440</div>
+      <div class="metric-sub" id="mTotalPixels">7,372,800 dots (7.37 MP)</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-label">
+        <span>Wall Dimensions</span>
+        <span class="metric-sub" id="mAspect">16 : 9</span>
+      </div>
+      <div class="metric-val" id="mDimensions">4.80 × 1.35 m</div>
+      <div class="metric-sub" id="mDimensionsFt">15.75 × 4.43 ft (6.48 m²)</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-label">
+        <span>Pixel Density</span>
+        <span>Resolution/m²</span>
+      </div>
+      <div class="metric-val" id="mDensity">1,137,778</div>
+      <div class="metric-sub" id="mDensityFt">105,703 dots/ft²</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-label">
+        <span>Cabinet Resolution</span>
+        <span id="mCabTotal">32 Cabinets</span>
+      </div>
+      <div class="metric-val" id="mCabRes">640 × 360</div>
+      <div class="metric-sub" id="mCabDots">230,400 dots per cabinet</div>
+    </div>
+  </div>
+
+  <!-- Section 2: Viewing Distance & Visual Acuity -->
+  <section class="panel">
+    <div class="panel-header">
+      <span class="panel-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        3. Human Viewing Distance & Visual Acuity Analysis
+      </span>
+      <span class="hint">Calculated based on human optical resolution (1 arcmin visual acuity standard)</span>
+    </div>
+
+    <div class="grid-3">
+      <div class="metric-card">
+        <div class="metric-label">
+          <span>Minimum Distance</span>
+          <span class="hint">1× Pitch Rule</span>
+        </div>
+        <div class="metric-val" id="vMinDist">0.94 m</div>
+        <div class="metric-sub" id="vMinDistFt">3.07 ft</div>
+        <p class="hint" style="margin-top: 6px;">Closest point where viewer can stand without noticeable individual diode pixelation.</p>
+      </div>
+
+      <div class="metric-card accent">
+        <div class="metric-label">
+          <span>Optimal Viewing Range</span>
+          <span class="hint">2× to 3× Pitch Rule</span>
+        </div>
+        <div class="metric-val highlight" id="vOptDist">1.88 ~ 2.81 m</div>
+        <div class="metric-sub" id="vOptDistFt">6.15 ~ 9.23 ft</div>
+        <p class="hint" style="margin-top: 6px;">The sweet spot for maximum immersion, full contrast fidelity, and visual comfort.</p>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">
+          <span>Visual Acuity (Retina) Distance</span>
+          <span class="hint">20/20 Vision Standard</span>
+        </div>
+        <div class="metric-val" id="vRetinaDist">3.22 m</div>
+        <div class="metric-sub" id="vRetinaDistFt">10.57 ft</div>
+        <p class="hint" style="margin-top: 6px;">Beyond this distance, individual pixels completely dissolve (equivalent to Apple Retina display).</p>
+      </div>
+    </div>
+
+    <!-- Interactive Distance Visual Gauge -->
+    <div class="distance-diagram-box">
+      <div style="font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase;">Viewing Zone Horizon Preview:</div>
+      <div class="dist-track" id="distTrack">
+        <!-- Screen Marker at Left -->
+        <div style="position: absolute; left: 0; bottom: 0; display: flex; flex-direction: column; align-items: flex-start;">
+          <div style="background: var(--ink); color: var(--bg); font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px;">LED SCREEN</div>
+          <div style="width: 4px; height: 35px; background: var(--accent); margin-left: 2px;"></div>
+        </div>
+        <!-- Markers dynamically positioned via JS -->
+        <div class="dist-marker" id="markMin">
+          <div class="dist-pin"></div>
+          <div class="dist-tag" id="tagMin">Min: 0.9m</div>
+        </div>
+        <div class="dist-marker" id="markOpt">
+          <div class="dist-pin accent"></div>
+          <div class="dist-tag accent" id="tagOpt">Optimal: 1.9-2.8m</div>
+        </div>
+        <div class="dist-marker" id="markRetina">
+          <div class="dist-pin"></div>
+          <div class="dist-tag" id="tagRetina">Retina: 3.2m</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audience Distance Simulator & Pitch Suitability Check (Live Two-Way Sync) -->
+    <div class="grid-1-2" style="align-items: center; background: var(--surface-sub); padding: 16px 20px; border-radius: 8px; border: 1px solid var(--line);">
+      <div class="field">
+        <label for="roomDistance">
+          <span>Audience Distance Simulator</span>
+          <span class="label-hint">Viewing distance from screen</span>
+        </label>
+        <div class="input-wrap">
+          <input id="roomDistance" type="number" step="0.5" min="0.5" max="100" value="0.9">
+          <div class="step-btns">
+            <button type="button" class="step-btn up">▲</button>
+            <button type="button" class="step-btn down">▼</button>
+          </div>
+          <span class="unit">meters</span>
+        </div>
+        <p class="hint">Automatically syncs with your selected pitch, or type any custom distance to test.</p>
+      </div>
+      <div>
+        <div style="font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase;">Pitch Match & Verification:</div>
+        <div style="font-size: 19px; font-weight: 700; color: var(--accent); margin: 3px 0;" id="recPitch">P0.9 mm or finer</div>
+        <p id="recPitchDesc" style="margin: 4px 0 0 0; font-size: 13px; line-height: 1.4;"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: Optical & Environment Parameters (Indoor vs Outdoor, Brightness, Refresh, Contrast) -->
+  <div class="grid-2">
+    <!-- Optical Parameters -->
+    <section class="panel">
+      <div class="panel-header">
+        <span class="panel-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          4. Optical & Image Quality Parameters
+        </span>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="brightness">
+            <span>White Balance Brightness</span>
+            <span class="label-hint" id="brightGuide">Indoor (500~1000 nits) • 1 nit = 1 cd/m²</span>
+          </label>
+          <div class="input-wrap">
+            <input id="brightness" type="number" step="50" min="200" max="12000" value="1000">
+            <div class="step-btns">
+              <button type="button" class="step-btn up">▲</button>
+              <button type="button" class="step-btn down">▼</button>
+            </div>
+            <span class="unit">nits</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="contrast">
+            <span>Contrast Ratio</span>
+            <span class="label-hint">Black depth & Dynamic Range</span>
+          </label>
+          <select id="contrast">
+            <option value="6500:1">6,500:1 (Standard SMD)</option>
+            <option value="10000:1">10,000:1 (High Contrast)</option>
+            <option value="15000:1" selected>15,000:1 (MIP / Deep Black)</option>
+            <option value="30000:1">30,000:1 (MicroLED CoB)</option>
+            <option value="5000:1">5,000:1 (Outdoor High-Bright)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="refreshRate">
+            <span>Refresh Rate Frequency</span>
+            <span class="label-hint">Anti-flicker / Scanlines</span>
+          </label>
+          <select id="refreshRate">
+            <option value="1920">1,920 Hz (Standard)</option>
+            <option value="3840">3,840 Hz (High Refresh - Broadcast Safe)</option>
+            <option value="7680" selected>7,680 Hz (Ultra High - XR Studio / Film)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="colorDepth">
+            <span>Color Processing Depth</span>
+            <span class="label-hint">Grayscale levels</span>
+          </label>
+          <select id="colorDepth">
+            <option value="13">13 Bit (8,192 levels)</option>
+            <option value="14">14 Bit (16,384 levels)</option>
+            <option value="16">16 Bit HDR (65,536 levels)</option>
+            <option value="16+6" selected>16+6 Bit D-Motion High Grayscale</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="viewAngle">
+            <span>Viewing Angle (H / V °)</span>
+          </label>
+          <select id="viewAngle">
+            <option value="170/170" selected>170° Horizontal / 170° Vertical (Wide)</option>
+            <option value="160/160">160° Horizontal / 160° Vertical</option>
+            <option value="140/120">140° Horizontal / 120° Vertical (Outdoor)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="colorTemp">
+            <span>Color Temperature</span>
+          </label>
+          <div class="input-wrap">
+            <input id="colorTemp" type="number" step="100" min="2500" max="11000" value="9300">
+            <div class="step-btns">
+              <button type="button" class="step-btn up">▲</button>
+              <button type="button" class="step-btn down">▼</button>
+            </div>
+            <span class="unit">K</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="driveMode">Drive Scan Mode</label>
+          <select id="driveMode">
+            <option value="1/30">1/30 Scan</option>
+            <option value="1/45" selected>1/45 Scan</option>
+            <option value="1/54">1/54 Scan</option>
+            <option value="1/60">1/60 Scan</option>
+            <option value="1/16">1/16 Scan (High Brightness Outdoor)</option>
+            <option value="1/8">1/8 Scan (Direct Sunlight)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="pixelComp">Pixel Diode Composition</label>
+          <select id="pixelComp">
+            <option value="MIP0606" selected>MIP 0606 (Micro-LED in Package)</option>
+            <option value="1R1G1B">1R1G1B (SMD Triad)</option>
+            <option value="TOP1515">TOP 1515 Black Face</option>
+            <option value="TOP2121">TOP 2121 Standard</option>
+            <option value="COB Micro">COB (Chip-on-Board)</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Electrical, Heat & Weight Parameters -->
+    <section class="panel">
+      <div class="panel-header">
+        <span class="panel-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          5. Electrical, Heat Dissipation & Load Engineering
+        </span>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="powerMax">Max Power / Cabinet</label>
+          <div class="input-wrap">
+            <input id="powerMax" type="number" step="5" value="47">
+            <div class="step-btns">
+              <button type="button" class="step-btn up">▲</button>
+              <button type="button" class="step-btn down">▼</button>
+            </div>
+            <span class="unit">W / cab</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="powerAvg">Avg Power / Cabinet</label>
+          <div class="input-wrap">
+            <input id="powerAvg" type="number" step="5" value="16">
+            <div class="step-btns">
+              <button type="button" class="step-btn up">▲</button>
+              <button type="button" class="step-btn down">▼</button>
+            </div>
+            <span class="unit">W / cab</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="acVoltage">AC Input Line Voltage</label>
+          <select id="acVoltage">
+            <option value="230" selected>230V AC (Standard Europe / Asia)</option>
+            <option value="110">110V AC (North America Standard)</option>
+            <option value="208">208V AC (Commercial 3-Phase)</option>
+            <option value="240">240V AC (Dedicated Power Line)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="acFreq">AC Frequency</label>
+          <select id="acFreq">
+            <option value="50/60" selected>50 / 60 Hz Universal</option>
+            <option value="60">60 Hz</option>
+            <option value="50">50 Hz</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Live Electrical Readouts Grid -->
+      <div class="grid-2" style="margin-top: 4px;">
+        <div class="metric-card">
+          <div class="metric-label">Total Wall Max Power</div>
+          <div class="metric-val" id="totPowerMax">1.50 kW</div>
+          <div class="metric-sub" id="powerPerSqm">232 W/m² peak</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Total Wall Avg Power</div>
+          <div class="metric-val" id="totPowerAvg">0.51 kW</div>
+          <div class="metric-sub" id="powerAvgSqm">77 W/m² typical</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Current Draw & Breaker</div>
+          <div class="metric-val" id="currentDraw">6.5 A</div>
+          <div class="metric-sub" id="breakerRec">Recommended: 10A / 16A circuit</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Thermal Heat Dissipation</div>
+          <div class="metric-val" id="heatBTU">5,130 BTU/hr</div>
+          <div class="metric-sub" id="heatTons">0.43 Tons of AC Cooling</div>
+        </div>
+      </div>
+
+      <div class="metric-card" style="margin-top: 4px;">
+        <div class="metric-label">
+          <span>Structural Total Weight</span>
+          <span id="weightPerSqm">16.8 kg/m²</span>
+        </div>
+        <div class="metric-val" id="totWeight">108.8 kg</div>
+        <div class="metric-sub" id="totWeightLbs">239.9 lbs (32 Cabinets × 3.4 kg)</div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Section 4: Operational Environment & Ingress Protection -->
+  <section class="panel">
+    <div class="panel-header">
+      <span class="panel-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        6. Operational Environment & Reliability Specifications
+      </span>
+      <span class="badge" id="envModeLabel">Indoor Environment Selected</span>
+    </div>
+
+    <div class="grid-4">
+      <div class="metric-card">
+        <div class="metric-label">Ingress Protection (IP)</div>
+        <div class="metric-val" id="ipRating">IP30 / IP40</div>
+        <div class="metric-sub" id="ipDesc">Dust protected (Front/Rear)</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Working Temperature</div>
+        <div class="metric-val" id="workTemp">-10°C to +40°C</div>
+        <div class="metric-sub">Storage: -20°C to +60°C</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Working Humidity</div>
+        <div class="metric-val" id="workHum">10% ~ 80% RH</div>
+        <div class="metric-sub">No Condensation</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">LED Diode Lifetime</div>
+        <div class="metric-val">100,000 hrs</div>
+        <div class="metric-sub">Maintenance: Full Front Access</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 5: Engineering Datasheet Comparison Table (Matches user's uploaded spec sheet!) -->
+  <section class="panel">
+    <div class="panel-header">
+      <span class="panel-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+        7. Technical Specification Sheet Matrix
+      </span>
+      <div style="display: flex; gap: 8px;">
+        <button type="button" class="btn" id="btnCopyTable">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          Copy Specs Text
+        </button>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table class="spec-table" id="specTable">
+        <thead>
+          <tr>
+            <th class="table-prop-title">Model</th>
+            <th class="current-col" id="thCurrentModel">YOUR SYSTEM (Live)</th>
+            <th>FM2709</th>
+            <th>FM2712</th>
+            <th>FC2712</th>
+            <th>FC2715</th>
+            <th>FS2718</th>
+            <th>FS2725</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Physical Parameters -->
+          <tr><td colspan="8" class="table-sec-header">Physical Parameter</td></tr>
+          <tr>
+            <td class="table-prop-title">Pixel Composition</td>
+            <td class="current-col" id="tComp">MIP0606</td>
+            <td>MIP0606</td>
+            <td>MIP0606</td>
+            <td>1R1G1B</td>
+            <td>1R1G1B</td>
+            <td>TOP1515</td>
+            <td>TOP2121</td>
+          </tr>
+          <tr>
+            <td class="table-prop-title">Pixel Pitch (mm)</td>
+            <td class="current-col" id="tPitch">0.9375</td>
+            <td>0.9375</td>
+            <td>1.25</td>
+            <td>1.25</td>
+            <td>1.5625</td>
+            <td>1.875</td>
+            <td>2.5</td>
+          </tr>
+          <tr>
+            <td class="table-prop-title">Cabinet Resolution (dots)</td>
+            <td class="current-col" id="tCabRes">640×360</td>
+            <td>640×360</td>
+            <td>480×270</td>
+            <td>480×270</td>
+            <td>384×216</td>
+            <td>320×180</td>
+            <td>240×135</td>
+          </tr>
+          <tr>
+            <td class="table-prop-title">Module Resolution (dots)</td>
+            <td class="current-col" id="tModRes">320×180</td>
+            <td>320×180</td>
+            <td>240×135</td>
+            <td>240×135</td>
+            <td>192×108</td>
+            <td>160×90</td>
+            <td>120×135</td>
+          </tr>
+          <tr>
+            <td class="table-prop-title">Pixel Density (dots / m²)</td>
+            <td class="current-col" id="tDensity">1,137,778</td>
+            <td>1,137,778</td>
+            <td>640,000</td>
+            <td>640,000</td>
+            <td>409,600</td>
+            <td>284,444</td>
+            <td>160,000</td>
+          </tr>
+          <tr>
+            <td class="table-prop-title">Cabinet Size (L*W*H) / (mm)</td>
+            <td class="current-col" id="tCabSize">600×337.5×31</td>
+            <td colspan="6" style="text-align: center;">600×337.5×31</td>
+          </tr>
+          <tr>
+            <td class="table-prop-title">Cabinet Material</td>
+            <td class="current-col" id="tCabMat">Die-cast mag-alu</td>
+            <td colspan="5" style="text-align: center;">Die-cast magnesium-aluminum</td>
+            <td>Aluminum</td>
+          </tr>
+          <tr>
+            <td class="table-prop-title">Cabinet Weight (Single / kg)</td>
+            <td class="current-col" id="tCabWt">3.4±0.1</td>
+            <td>3.4±0.1</td>
+            <td>3.4±0.1</td>
+            <td>3.4±0.1</td>
+            <td>3.4±0.1</td>
+            <td>3.4±0.1</td>
+            <td>3.4±0.1</td>
+          </tr>
+
+          <!-- Optical Parameters -->
+          <tr><td colspan="8" class="table-sec-header">Optical Parameter</td></tr>
+          <tr>
+            <td class="table-prop-title">Color Processing Depth (Bit)</td>
+            <td class="current-col" id="tBitDepth">16+6</td>
+            <td>16+6</td>
+            <td>16+6</td>
+            <td>13</td>
+            <td>14</td>
+            <td>14</td>
+            <td>14</td>
+          </tr>
+          <tr>
+            <td class="table-prop-title">Contrast Ratio</td>
+            <td class="current-col" id="tContrast">15,000:1</td>
+            <td>15,000:1</td>
+            <td>15,000:1</td>
+            <td>15,000:1</td>
+            <td>15,000:1</td>
+            <td>6,500:1</td>
+            <td>6,500:1</td>
+          </tr>
+          <tr>
+            <td class="table-prop-title">Refresh Rate Frequency (Hz)</td>
+            <td class="current-col" id="tRefresh">7,680</td>
+            <td>7,680</td>
+            <td>7,680</td>
+            <td>3,840</td>
+            <td>3,840</td>
+            <td>3,840</td>
+            <td>3,840</td>
+          </tr>
+          <tr>
+            <td class="table-prop-title">Drive Mode</td>
+            <td class="current-col" id="tDrive">1/45</td>
+            <td>1/45</td>
+            <td>1/30</td>
+            <td>1/60</td>
+            <td>1/54</td>
+            <td>1/54</td>
+            <td>1/45</td>
+          </tr>
+          <tr>
+            <td class="table-prop-title">White Balance Brightness (nit)</td>
+            <td class="current-col" id="tBright">1,000</td>
+            <td>1,000</td>
+            <td>1,000</td>
+            <td>800</td>
+            <td>600</td>
+            <td>550</td>
+            <td>600</td>
+          </tr>
+          <tr>
+            <td class="table-prop-title">Color Temperature (K)</td>
+            <td class="current-col" id="tTemp">9,300</td>
+            <td colspan="6" style="text-align: center;">9,300</td>
+          </tr>
+          <tr>
+            <td class="table-prop-title">Viewing Angle (H/V °)</td>
+            <td class="current-col" id="tViewAng">170/170</td>
+            <td>170/170</td>
+            <td>170/170</td>
+            <td>170/170</td>
+            <td>170/170</td>
+            <td>160/160</td>
+            <td>160/160</td>
+          </tr>
+
+          <!-- Electrical Parameters -->
+          <tr><td colspan="8" class="table-sec-header">Electrical Parameter</td></tr>
+          <tr>
+            <td class="table-prop-title">AC Input Voltage (V)</td>
+            <td class="current-col" id="tVoltage">AC100~240</td>
+            <td colspan="6" style="text-align: center;">AC100~240</td>
+          </tr>
+          <tr>
+            <td class="table-prop-title">AC Input Frequency (Hz)</td>
+            <td class="current-col" id="tFreq">60</td>
+            <td colspan="6" style="text-align: center;">60</td>
+          </tr>
+          <tr>
+            <td class="table-prop-title">Cabinet Max Power (W/Unit)</td>
+            <td class="current-col" id="tPwrUnitMax">47</td>
+            <td>47</td>
+            <td>43</td>
+            <td>61</td>
+            <td>58</td>
+            <td>60</td>
+            <td>69</td>
+          </tr>
+          <tr>
+            <td class="table-prop-title">Cabinet Avg Power (W/Unit)</td>
+            <td class="current-col" id="tPwrUnitAvg">16</td>
+            <td>16</td>
+            <td>14</td>
+            <td>20</td>
+            <td>19</td>
+            <td>20</td>
+            <td>23</td>
+          </tr>
+          <tr>
+            <td class="table-prop-title">Max Power Consumption (W/m²)</td>
+            <td class="current-col" id="tPwrSqmMax">232</td>
+            <td>232</td>
+            <td>212</td>
+            <td>301</td>
+            <td>285</td>
+            <td>296</td>
+            <td>341</td>
+          </tr>
+          <tr>
+            <td class="table-prop-title">Avg Power Consumption (W/m²)</td>
+            <td class="current-col" id="tPwrSqmAvg">77</td>
+            <td>77</td>
+            <td>71</td>
+            <td>100</td>
+            <td>95</td>
+            <td>99</td>
+            <td>114</td>
+          </tr>
+
+          <!-- Environment Parameters -->
+          <tr><td colspan="8" class="table-sec-header">Operation Environment Parameter</td></tr>
+          <tr>
+            <td class="table-prop-title">Storage Temperature (°C)</td>
+            <td class="current-col">-20 ~ 60</td>
+            <td colspan="6" style="text-align: center;">-20 ~ 60 (Does not include GOB/HOB)</td>
+          </tr>
+          <tr>
+            <td class="table-prop-title">Working Temperature (°C)</td>
+            <td class="current-col">-10 ~ 40</td>
+            <td colspan="6" style="text-align: center;">-10 ~ 40 (Does not include GOB/HOB)</td>
+          </tr>
+          <tr>
+            <td class="table-prop-title">Working Humidity (RH)</td>
+            <td class="current-col">10%~80%</td>
+            <td colspan="6" style="text-align: center;">10%~80% No Condensation</td>
+          </tr>
+          <tr>
+            <td class="table-prop-title">LED Lifetime (hrs)</td>
+            <td class="current-col">100,000</td>
+            <td colspan="6" style="text-align: center;">100,000</td>
+          </tr>
+          <tr>
+            <td class="table-prop-title">Maintenance Mode</td>
+            <td class="current-col">Full Front Access</td>
+            <td colspan="6" style="text-align: center;">Full Front Access</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Technical Explanations -->
+  <details>
+    <summary>Engineering Formulas & Reference Criteria Guide</summary>
+    <div class="details-content" style="display: flex; flex-direction: column; gap: 12px; font-size: 14px;">
+      <div><strong>1. Screen Diagonal & Cabinet Count Formula:</strong>
+        <ul style="margin: 4px 0 0 20px;">
+          <li>Theoretical Diagonal (mm) = <code style="font-family: var(--font-num); background: var(--chip); padding: 2px 6px; border-radius: 4px;">Diagonal in Inches × 25.4</code></li>
+          <li>For 16:9 Display: <code style="font-family: var(--font-num); background: var(--chip); padding: 2px 6px; border-radius: 4px;">Width = Diagonal × (16 / √337)</code>, <code style="font-family: var(--font-num); background: var(--chip); padding: 2px 6px; border-radius: 4px;">Height = Diagonal × (9 / √337)</code></li>
+          <li>Raw Cabinet Count = <code style="font-family: var(--font-num); background: var(--chip); padding: 2px 6px; border-radius: 4px;">Width / CabinetWidth</code> and <code style="font-family: var(--font-num); background: var(--chip); padding: 2px 6px; border-radius: 4px;">Height / CabinetHeight</code></li>
+          <li>Cabinets must be integers; therefore, the nearest integer grid provides the closest buildable physical size.</li>
+        </ul>
+      </div>
+      <div><strong>2. Pixel Density Formula:</strong> <code style="font-family: var(--font-num); background: var(--chip); padding: 2px 6px; border-radius: 4px;">Density = 1,000,000 / (Pixel Pitch in mm)²</code> (dots per square meter).</div>
+      <div><strong>3. Visual Acuity (Retina) Distance:</strong> Based on the standard minimum angle of resolution (MAR) of 1 arcminute (1/60th degree) for normal 20/20 human vision: <code style="font-family: var(--font-num); background: var(--chip); padding: 2px 6px; border-radius: 4px;">Distance = Pitch (mm) / (2 × tan(0.5 / 60)) ≈ 3.438 × Pitch in meters</code>.</div>
+      <div><strong>4. Brightness & Optical Luminance:</strong>
+        <ul style="margin: 4px 0 0 20px;">
+          <li><strong>1 Nit = 1 cd/m²:</strong> (Candela per square meter) is the international standard unit of display luminance.</li>
+          <li><strong>Indoor:</strong> 500–1000 nits provides comfortable illumination in controlled ambient light without eye strain.</li>
+          <li><strong>Outdoor:</strong> 4,500–10,000 nits is necessary to cut through direct sunlight and prevent screen wash-out.</li>
+        </ul>
+      </div>
+      <div><strong>5. Heat Dissipation (BTU/hr):</strong> Calculated as <code style="font-family: var(--font-num); background: var(--chip); padding: 2px 6px; border-radius: 4px;">BTU/hr = Watts × 3.412142</code>. (1 Ton of Air Conditioning = 12,000 BTU/hr).</div>
+      <div><strong>6. Current Draw (Amperes):</strong> <code style="font-family: var(--font-num); background: var(--chip); padding: 2px 6px; border-radius: 4px;">Amps = Total Max Power (Watts) / Line Voltage (V)</code>.</div>
+    </div>
+  </details>
+
+  <footer>
+    <div>LED Display Engineering Calculator &bull; High Precision Instrument</div>
+    <div>Supports Fine-Pitch MIP, MicroLED, COB, SMD Indoor & Outdoor Video Walls</div>
+  </footer>
+</div>
+
+<!-- Application Logic -->
+<script>
+(function() {
+  'use strict';
+
+  // --- Model Database (from the spec sheet) ---
+  var MODELS = {
+    'FM2709': {
+      name: 'FM2709',
+      env: 'indoor',
+      pitch: 0.9375,
+      pixelComp: 'MIP0606',
+      cabWidth: 600, cabHeight: 337.5, cabDepth: 31,
+      modWidth: 300, modHeight: 168.75,
+      cabResW: 640, cabResH: 360,
+      modResW: 320, modResH: 180,
+      density: 1137778,
+      material: 'Die-cast magnesium-aluminum',
+      weight: 3.4,
+      colorDepth: '16+6',
+      contrast: '15000:1',
+      refresh: 7680,
+      drive: '1/45',
+      brightness: 1000,
+      colorTemp: 9300,
+      viewAngle: '170/170',
+      pwrUnitMax: 47,
+      pwrUnitAvg: 16,
+      pwrSqmMax: 232,
+      pwrSqmAvg: 77
+    },
+    'FM2712': {
+      name: 'FM2712',
+      env: 'indoor',
+      pitch: 1.25,
+      pixelComp: 'MIP0606',
+      cabWidth: 600, cabHeight: 337.5, cabDepth: 31,
+      modWidth: 300, modHeight: 168.75,
+      cabResW: 480, cabResH: 270,
+      modResW: 240, modResH: 135,
+      density: 640000,
+      material: 'Die-cast magnesium-aluminum',
+      weight: 3.4,
+      colorDepth: '16+6',
+      contrast: '15000:1',
+      refresh: 7680,
+      drive: '1/30',
+      brightness: 1000,
+      colorTemp: 9300,
+      viewAngle: '170/170',
+      pwrUnitMax: 43,
+      pwrUnitAvg: 14,
+      pwrSqmMax: 212,
+      pwrSqmAvg: 71
+    },
+    'FC2712': {
+      name: 'FC2712',
+      env: 'indoor',
+      pitch: 1.25,
+      pixelComp: '1R1G1B',
+      cabWidth: 600, cabHeight: 337.5, cabDepth: 31,
+      modWidth: 300, modHeight: 168.75,
+      cabResW: 480, cabResH: 270,
+      modResW: 240, modResH: 135,
+      density: 640000,
+      material: 'Die-cast magnesium-aluminum',
+      weight: 3.4,
+      colorDepth: '13',
+      contrast: '15000:1',
+      refresh: 3840,
+      drive: '1/60',
+      brightness: 800,
+      colorTemp: 9300,
+      viewAngle: '170/170',
+      pwrUnitMax: 61,
+      pwrUnitAvg: 20,
+      pwrSqmMax: 301,
+      pwrSqmAvg: 100
+    },
+    'FC2715': {
+      name: 'FC2715',
+      env: 'indoor',
+      pitch: 1.5625,
+      pixelComp: '1R1G1B',
+      cabWidth: 600, cabHeight: 337.5, cabDepth: 31,
+      modWidth: 300, modHeight: 168.75,
+      cabResW: 384, cabResH: 216,
+      modResW: 192, modResH: 108,
+      density: 409600,
+      material: 'Die-cast magnesium-aluminum',
+      weight: 3.4,
+      colorDepth: '14',
+      contrast: '15000:1',
+      refresh: 3840,
+      drive: '1/54',
+      brightness: 600,
+      colorTemp: 9300,
+      viewAngle: '170/170',
+      pwrUnitMax: 58,
+      pwrUnitAvg: 19,
+      pwrSqmMax: 285,
+      pwrSqmAvg: 95
+    },
+    'FS2718': {
+      name: 'FS2718',
+      env: 'indoor',
+      pitch: 1.875,
+      pixelComp: 'TOP1515',
+      cabWidth: 600, cabHeight: 337.5, cabDepth: 31,
+      modWidth: 300, modHeight: 168.75,
+      cabResW: 320, cabResH: 180,
+      modResW: 160, modResH: 90,
+      density: 284444,
+      material: 'Die-cast magnesium-aluminum',
+      weight: 3.4,
+      colorDepth: '14',
+      contrast: '6500:1',
+      refresh: 3840,
+      drive: '1/54',
+      brightness: 550,
+      colorTemp: 9300,
+      viewAngle: '160/160',
+      pwrUnitMax: 60,
+      pwrUnitAvg: 20,
+      pwrSqmMax: 296,
+      pwrSqmAvg: 99
+    },
+    'FS2725': {
+      name: 'FS2725',
+      env: 'indoor',
+      pitch: 2.5,
+      pixelComp: 'TOP2121',
+      cabWidth: 600, cabHeight: 337.5, cabDepth: 31,
+      modWidth: 300, modHeight: 337.5,
+      cabResW: 240, cabResH: 135,
+      modResW: 120, modResH: 135,
+      density: 160000,
+      material: 'Aluminum',
+      weight: 3.4,
+      colorDepth: '14',
+      contrast: '6500:1',
+      refresh: 3840,
+      drive: '1/45',
+      brightness: 600,
+      colorTemp: 9300,
+      viewAngle: '160/160',
+      pwrUnitMax: 69,
+      pwrUnitAvg: 23,
+      pwrSqmMax: 341,
+      pwrSqmAvg: 114
+    },
+    'OUT39': {
+      name: 'Outdoor P3.91',
+      env: 'outdoor',
+      pitch: 3.91,
+      pixelComp: '1R1G1B',
+      cabWidth: 500, cabHeight: 500, cabDepth: 75,
+      modWidth: 250, modHeight: 250,
+      cabResW: 128, cabResH: 128,
+      modResW: 64, modResH: 64,
+      density: 65536,
+      material: 'Die-cast aluminum',
+      weight: 7.5,
+      colorDepth: '14',
+      contrast: '5000:1',
+      refresh: 3840,
+      drive: '1/16',
+      brightness: 5500,
+      colorTemp: 6500,
+      viewAngle: '140/120',
+      pwrUnitMax: 220,
+      pwrUnitAvg: 75,
+      pwrSqmMax: 880,
+      pwrSqmAvg: 300
+    },
+    'OUT60': {
+      name: 'Outdoor P6.0',
+      env: 'outdoor',
+      pitch: 6.0,
+      pixelComp: '1R1G1B',
+      cabWidth: 960, cabHeight: 960, cabDepth: 120,
+      modWidth: 320, modHeight: 160,
+      cabResW: 160, cabResH: 160,
+      modResW: 53, modResH: 26,
+      density: 27777,
+      material: 'Sheet metal iron',
+      weight: 35.0,
+      colorDepth: '14',
+      contrast: '5000:1',
+      refresh: 1920,
+      drive: '1/8',
+      brightness: 6550,
+      colorTemp: 6500,
+      viewAngle: '140/120',
+      pwrUnitMax: 700,
+      pwrUnitAvg: 240,
+      pwrSqmMax: 760,
+      pwrSqmAvg: 260
+    }
+  };
+
+  // Helper DOM selection
+  var $ = function(id) { return document.getElementById(id); };
+
+  // App State
+  var state = {
+    env: 'indoor', // 'indoor' | 'outdoor'
+    activeModel: 'FM2709',
+    sizingMode: 'cabinets', // 'cabinets' | 'custom' | 'diagonal'
+    cols: 8,
+    rows: 4
+  };
+
+  // Formatters
+  var FT_PER_M = 3.28084;
+  var SQFT_PER_SQM = 10.7639;
+
+  function fmt(n, decimals) {
+    if (isNaN(n) || !isFinite(n)) return '-';
+    var d = decimals !== undefined ? decimals : 2;
+    var s = n.toFixed(d);
+    if (s.indexOf('.') > -1) {
+      s = s.replace(/0+$/, '').replace(/\.$/, '');
+    }
+    return s;
+  }
+
+  function fmtNum(n) {
+    if (isNaN(n) || !isFinite(n)) return '-';
+    return Math.round(n).toLocaleString('en-US');
+  }
+
+  // Load Model Preset
+  function loadModel(key) {
+    var m = MODELS[key];
+    if (!m) return;
+    state.activeModel = key;
+    setEnv(m.env, false);
+
+    $('pitch').value = m.pitch;
+    $('cabWidth').value = m.cabWidth;
+    $('cabHeight').value = m.cabHeight;
+    $('cabWeight').value = m.weight;
+    $('cabMaterial').value = m.material;
+
+    $('brightness').value = m.brightness;
+    $('contrast').value = m.contrast;
+    $('refreshRate').value = m.refresh;
+    $('colorDepth').value = m.colorDepth;
+    $('viewAngle').value = m.viewAngle;
+    $('colorTemp').value = m.colorTemp;
+    $('driveMode').value = m.drive;
+    $('pixelComp').value = m.pixelComp;
+
+    $('powerMax').value = m.pwrUnitMax;
+    $('powerAvg').value = m.pwrUnitAvg;
+
+    // SYNC AUDIENCE DISTANCE AUTOMATICALLY!
+    $('roomDistance').value = fmt(m.pitch, 1);
+
+    // Highlight Model Chip
+    var chips = document.querySelectorAll('#modelChips .chip');
+    chips.forEach(function(c) {
+      c.classList.toggle('active', c.getAttribute('data-model') === key);
+    });
+
+    $('thCurrentModel').textContent = m.name + ' (Selected)';
+
+    recalc();
+  }
+
+  // 136-inch All-in-One 1.5mm Preset (Exact User Example!)
+  function applyAIO136Preset() {
+    setEnv('indoor', false);
+    $('pitch').value = 1.5;
+    $('cabWidth').value = 600;
+    $('cabHeight').value = 337.5;
+    $('cabWeight').value = 3.4;
+    $('cabMaterial').value = 'Die-cast magnesium-aluminum';
+    $('brightness').value = 800;
+    $('contrast').value = '15000:1';
+    $('refreshRate').value = 3840;
+    $('colorDepth').value = '16+6';
+    $('roomDistance').value = 1.5;
+    $('screenDiagonal').value = 136;
+    $('diagAspect').value = '16:9';
+
+    // Switch to Diagonal mode
+    setSizingMode('diagonal');
+
+    // Highlight preset chips
+    var chips = document.querySelectorAll('#modelChips .chip');
+    chips.forEach(function(c) { c.classList.remove('active'); });
+    $('btnPresetAIO136').classList.add('active');
+    $('thCurrentModel').textContent = '136″ AIO (1.5mm - 5×5)';
+
+    recalc();
+  }
+
+  // Environment Toggle (Indoor vs Outdoor)
+  function setEnv(env, triggerRecalc) {
+    state.env = env;
+    var btnIn = $('btnIndoor');
+    var btnOut = $('btnOutdoor');
+    var badge = $('envBadge');
+    var modeLbl = $('envModeLabel');
+    var ip = $('ipRating');
+    var ipDesc = $('ipDesc');
+    var guide = $('brightGuide');
+
+    if (env === 'indoor') {
+      btnIn.className = 'seg-btn indoor-active';
+      btnOut.className = 'seg-btn';
+      badge.className = 'badge-env badge-indoor';
+      badge.textContent = '● Indoor Profile';
+      modeLbl.textContent = 'Indoor Environment Active';
+      ip.textContent = 'IP30 / IP40';
+      ipDesc.textContent = 'Dust-proof Front/Rear (Clean room/studio)';
+      guide.textContent = 'Indoor (500~1000 nits) • 1 nit = 1 cd/m²';
+    } else {
+      btnIn.className = 'seg-btn';
+      btnOut.className = 'seg-btn outdoor-active';
+      badge.className = 'badge-env badge-outdoor';
+      badge.textContent = '● Outdoor Profile';
+      modeLbl.textContent = 'Outdoor Weatherproof Profile Active';
+      ip.textContent = 'IP65 / IP66';
+      ipDesc.textContent = 'Waterproof & Dust Tight (Direct Sun/Rain)';
+      guide.textContent = 'Outdoor (4500~10000 nits) • 1 nit = 1 cd/m²';
+    }
+
+    if (triggerRecalc !== false) recalc();
+  }
+
+  // Sizing Mode Toggle (Cabinets, Custom Size, Diagonal)
+  function setSizingMode(mode) {
+    state.sizingMode = mode;
+    var btnCab = $('modeCabinets');
+    var btnCust = $('modeCustomSize');
+    var btnDiag = $('modeDiagonal');
+    var cabBlock = $('cabinetCountBlock');
+    var custBlock = $('customSizeBlock');
+    var diagBlock = $('diagonalBlock');
+
+    btnCab.classList.toggle('active', mode === 'cabinets');
+    btnCust.classList.toggle('active', mode === 'custom');
+    btnDiag.classList.toggle('active', mode === 'diagonal');
+
+    cabBlock.style.display = mode === 'cabinets' ? 'grid' : 'none';
+    custBlock.style.display = mode === 'custom' ? 'grid' : 'none';
+    diagBlock.style.display = mode === 'diagonal' ? 'flex' : 'none';
+
+    recalc();
+  }
+
+  // Main Recalculate Function
+  function recalc() {
+    var pitch = parseFloat($('pitch').value);
+    if (!pitch || pitch <= 0) pitch = 1.0;
+
+    var cabW = parseFloat($('cabWidth').value) || 600;
+    var cabH = parseFloat($('cabHeight').value) || 337.5;
+    var cabWt = parseFloat($('cabWeight').value) || 3.4;
+
+    var cols, rows;
+    if (state.sizingMode === 'cabinets') {
+      cols = parseInt($('cols').value, 10) || 1;
+      rows = parseInt($('rows').value, 10) || 1;
+      if (cols < 1) cols = 1;
+      if (rows < 1) rows = 1;
+    } else if (state.sizingMode === 'custom') {
+      var wTarget = parseFloat($('wallWidth').value) || 4800;
+      var hTarget = parseFloat($('wallHeight').value) || 1350;
+      cols = Math.max(1, Math.round(wTarget / cabW));
+      rows = Math.max(1, Math.round(hTarget / cabH));
+      $('cols').value = cols;
+      $('rows').value = rows;
+    } else if (state.sizingMode === 'diagonal') {
+      // 1. Target Screen Diagonal calculation (Exact user requested logic!)
+      var targetDiagInches = parseFloat($('screenDiagonal').value) || 136;
+      var arParts = ($('diagAspect').value || '16:9').split(':');
+      var arW = parseFloat(arParts[0]) || 16;
+      var arH = parseFloat(arParts[1]) || 9;
+
+      // Theoretical geometry
+      var diagMm = targetDiagInches * 25.4;
+      var diagFactor = Math.sqrt(arW * arW + arH * arH);
+      var wTheo = diagMm * (arW / diagFactor);
+      var hTheo = diagMm * (arH / diagFactor);
+
+      // Raw cabinet division
+      var rawCols = wTheo / cabW;
+      var rawRows = hTheo / cabH;
+
+      // Practical integer cabinet count (Best Match Whole Numbers)
+      cols = Math.max(1, Math.round(rawCols));
+      rows = Math.max(1, Math.round(rawRows));
+      $('cols').value = cols;
+      $('rows').value = rows;
+
+      // Actual built metrics
+      var actualWMm = cols * cabW;
+      var actualHMm = rows * cabH;
+      var actualDiagMm = Math.sqrt(actualWMm * actualWMm + actualHMm * actualHMm);
+      var actualDiagInches = actualDiagMm / 25.4;
+      var diffInches = actualDiagInches - targetDiagInches;
+      var matchPct = Math.max(0, 100 - (Math.abs(diffInches) / targetDiagInches * 100));
+
+      // Update Diagonal Card Elements
+      $('diagTheoSize').textContent = fmt(wTheo, 1) + ' mm × ' + fmt(hTheo, 1) + ' mm (Diag: ' + fmt(diagMm, 1) + ' mm)';
+      $('diagRawCount').textContent = fmt(rawCols, 2) + ' W × ' + fmt(rawRows, 2) + ' H cabinets';
+      $('diagMatchBadge').textContent = fmt(matchPct, 1) + '% Match (' + (diffInches >= 0 ? '+' : '') + fmt(diffInches, 1) + '″)';
+
+      $('diagPracticalNote').innerHTML = '<strong>Practical Assembly:</strong> Exact ' + fmt(targetDiagInches, 0) + '″ requires <strong>' + fmt(rawCols, 2) + ' × ' + fmt(rawRows, 2) + ' cabinets</strong>. Cabinets must be whole integers, so the best practical build is <strong>' + cols + ' × ' + rows + ' = ' + (cols * rows) + ' cabinets</strong> producing <strong>' + fmt(actualDiagInches, 1) + ' inch (' + fmt(actualWMm, 0) + ' × ' + fmt(actualHMm, 1) + ' mm)</strong>.';
+
+      var singleCabDotsW = Math.round(cabW / pitch);
+      var singleCabDotsH = Math.round(cabH / pitch);
+      $('diagCabRes').textContent = singleCabDotsW + ' × ' + singleCabDotsH + ' px (' + fmtNum(singleCabDotsW * singleCabDotsH) + ' dots)';
+      $('diagWallRes').textContent = (cols * singleCabDotsW) + ' × ' + (rows * singleCabDotsH) + ' px (' + fmt((cols * singleCabDotsW * rows * singleCabDotsH) / 1000000, 2) + ' MP)';
+    }
+
+    var totalCabinets = cols * rows;
+
+    // Cabinet Pixels
+    var cabDotsW = Math.round(cabW / pitch);
+    var cabDotsH = Math.round(cabH / pitch);
+
+    // Total Screen Size (mm & meters)
+    var screenWidthMm = cols * cabW;
+    var screenHeightMm = rows * cabH;
+    var screenWidthM = screenWidthMm / 1000;
+    var screenHeightM = screenHeightMm / 1000;
+    var screenAreaSqm = screenWidthM * screenHeightM;
+    var screenAreaSqft = screenAreaSqm * SQFT_PER_SQM;
+
+    // Total Resolution
+    var totalDotsW = cols * cabDotsW;
+    var totalDotsH = rows * cabDotsH;
+    var totalPixels = totalDotsW * totalDotsH;
+    var megaPixels = totalPixels / 1000000;
+
+    // Pixel Density
+    var density = Math.round(1000000 / (pitch * pitch));
+    var densityFt = Math.round(density / SQFT_PER_SQM);
+
+    // Diagonal in inches
+    var wallDiagMm = Math.sqrt(screenWidthMm * screenWidthMm + screenHeightMm * screenHeightMm);
+    var wallDiagInches = wallDiagMm / 25.4;
+
+    // Aspect Ratio Calculation
+    var aspect = screenWidthMm / screenHeightMm;
+    var aspectText = fmt(aspect, 2) + " : 1";
+    var aspectBadge = fmt(wallDiagInches, 0) + "″ Custom Aspect";
+    if (Math.abs(aspect - (16/9)) < 0.05) {
+      aspectText = "16 : 9";
+      aspectBadge = fmt(wallDiagInches, 0) + "″ 16:9 Standard AIO";
+    } else if (Math.abs(aspect - (21/9)) < 0.05) {
+      aspectText = "21 : 9";
+      aspectBadge = fmt(wallDiagInches, 0) + "″ 21:9 Ultra-Wide";
+    } else if (Math.abs(aspect - (32/9)) < 0.05) {
+      aspectText = "32 : 9";
+      aspectBadge = fmt(wallDiagInches, 0) + "″ 32:9 Panoramic";
+    } else if (Math.abs(aspect - (4/3)) < 0.05) {
+      aspectText = "4 : 3";
+      aspectBadge = fmt(wallDiagInches, 0) + "″ 4:3 Classic";
+    }
+    $('aspectBadge').textContent = aspectBadge;
+
+    // Video Standard Tag
+    var videoStd = "Custom";
+    if (totalDotsW >= 7680 && totalDotsH >= 4320) videoStd = "8K UHD Native";
+    else if (totalDotsW >= 3840 && totalDotsH >= 2160) videoStd = "4K UHD Native";
+    else if (totalDotsW >= 1920 && totalDotsH >= 1080) videoStd = "1080p FHD Native";
+    else if (totalDotsW >= 1280 && totalDotsH >= 720) videoStd = "720p HD";
+    $('videoStandardBadge').textContent = videoStd;
+
+    // Update KPI Metric Cards
+    $('mTotalRes').textContent = fmtNum(totalDotsW) + " × " + fmtNum(totalDotsH);
+    $('mTotalPixels').textContent = fmtNum(totalPixels) + " dots (" + fmt(megaPixels, 2) + " MP)";
+    $('mDimensions').textContent = fmt(screenWidthM, 2) + " × " + fmt(screenHeightM, 2) + " m (" + fmt(wallDiagInches, 1) + "″)";
+    $('mDimensionsFt').textContent = fmt(screenWidthM * FT_PER_M, 2) + " × " + fmt(screenHeightM * FT_PER_M, 2) + " ft (" + fmt(screenAreaSqm, 2) + " m²)";
+    $('mAspect').textContent = aspectText;
+    $('mDensity').textContent = fmtNum(density) + " dots/m²";
+    $('mDensityFt').textContent = fmtNum(densityFt) + " dots/ft²";
+
+    $('mCabTotal').textContent = totalCabinets + " Cabinets (" + cols + "W × " + rows + "H)";
+    $('mCabRes').textContent = cabDotsW + " × " + cabDotsH;
+    $('mCabDots').textContent = fmtNum(cabDotsW * cabDotsH) + " dots per unit";
+
+    // Dynamic Dot Grid Preview
+    var gap = Math.min(80, Math.max(4, pitch * 10));
+    var dots = $('dotsPreview');
+    dots.style.setProperty('--gap', gap + 'px');
+    $('dotsTag').textContent = 'P' + fmt(pitch, 3) + ' mm pitch dot grid preview';
+
+    // Highlight active pitch chip if exact match
+    var pitchChips = document.querySelectorAll('#pitchChips .chip');
+    pitchChips.forEach(function(c) {
+      var cp = parseFloat(c.getAttribute('data-p'));
+      c.setAttribute('aria-pressed', Math.abs(cp - pitch) < 0.01 ? 'true' : 'false');
+    });
+
+    // --- Viewing Distances ---
+    // 1x Pitch Rule (meters)
+    var minM = pitch;
+    var minFt = minM * FT_PER_M;
+
+    // 2x - 3x Pitch Rule (meters)
+    var optMinM = 2 * pitch;
+    var optMaxM = 3 * pitch;
+    var optMinFt = optMinM * FT_PER_M;
+    var optMaxFt = optMaxM * FT_PER_M;
+
+    // 20/20 Visual Acuity (Retina) Distance
+    var retinaM = 3.438 * pitch;
+    var retinaFt = retinaM * FT_PER_M;
+
+    $('vMinDist').textContent = fmt(minM, 2) + " m";
+    $('vMinDistFt').textContent = fmt(minFt, 2) + " ft";
+    $('vOptDist').textContent = fmt(optMinM, 2) + " ~ " + fmt(optMaxM, 2) + " m";
+    $('vOptDistFt').textContent = fmt(optMinFt, 1) + " ~ " + fmt(optMaxFt, 1) + " ft";
+    $('vRetinaDist').textContent = fmt(retinaM, 2) + " m";
+    $('vRetinaDistFt').textContent = fmt(retinaFt, 2) + " ft";
+
+    // Distance Track Graphic Update
+    var maxScaleM = Math.max(retinaM * 1.3, 10);
+    function pct(val) { return Math.min(95, Math.max(8, (val / maxScaleM) * 100)) + '%'; }
+
+    $('markMin').style.left = pct(minM);
+    $('tagMin').textContent = 'Min: ' + fmt(minM, 1) + 'm';
+
+    $('markOpt').style.left = pct((optMinM + optMaxM) / 2);
+    $('tagOpt').textContent = 'Optimal: ' + fmt(optMinM, 1) + '-' + fmt(optMaxM, 1) + 'm';
+
+    $('markRetina').style.left = pct(retinaM);
+    $('tagRetina').textContent = 'Retina: ' + fmt(retinaM, 1) + 'm';
+
+    // --- Two-Way Audience Distance Simulator & Pitch Suitability ---
+    var roomDist = parseFloat($('roomDistance').value);
+    if (isNaN(roomDist) || roomDist <= 0) {
+      roomDist = pitch;
+    }
+    var recMaxPitch = roomDist; // 1m per 1mm rule
+    $('recPitch').textContent = "P" + fmt(recMaxPitch, 1) + " mm or finer";
+
+    var descEl = $('recPitchDesc');
+    if (roomDist < pitch * 0.9) {
+      descEl.innerHTML = '<span style="color:#E11D48; font-weight:700;">⚠️ Warning: At ' + fmt(roomDist, 1) + 'm viewing distance, a P' + fmt(pitch, 1) + ' screen will look grainy/pixelated.</span><br>' +
+        'For ' + fmt(roomDist, 1) + 'm distance, you should choose <strong>P' + fmt(recMaxPitch, 1) + '</strong> or finer, OR move audience back to at least <strong>' + fmt(pitch, 1) + 'm</strong>.';
+    } else if (roomDist >= pitch * 2) {
+      descEl.innerHTML = '<span style="color:#059669; font-weight:700;">✅ Optimal Viewing: At ' + fmt(roomDist, 1) + 'm, your P' + fmt(pitch, 1) + ' screen is in the prime sweet spot with crisp, seamless clarity.</span><br>' +
+        'Viewers enjoy full color blending with zero diode pixelation.';
+    } else {
+      descEl.innerHTML = '<span style="color:var(--accent); font-weight:700;">✅ Comfortable Viewing: At ' + fmt(roomDist, 1) + 'm, P' + fmt(pitch, 1) + ' pixels blend together nicely without visible diode grid.</span><br>' +
+        'Good balance of viewing distance and screen clarity.';
+    }
+
+    // --- Electrical & Power Calculations ---
+    var pwrMaxUnit = parseFloat($('powerMax').value) || 47;
+    var pwrAvgUnit = parseFloat($('powerAvg').value) || 16;
+    var voltage = parseFloat($('acVoltage').value) || 230;
+
+    var totalMaxW = totalCabinets * pwrMaxUnit;
+    var totalAvgW = totalCabinets * pwrAvgUnit;
+    var totalMaxKW = totalMaxW / 1000;
+    var totalAvgKW = totalAvgW / 1000;
+
+    var pwrPerSqmMax = screenAreaSqm > 0 ? (totalMaxW / screenAreaSqm) : 0;
+    var pwrPerSqmAvg = screenAreaSqm > 0 ? (totalAvgW / screenAreaSqm) : 0;
+
+    var currentAmps = totalMaxW / voltage;
+    var breakerRec = currentAmps * 1.25; // 80% rule for continuous breaker load
+    var breakerRating = breakerRec <= 10 ? 10 : (breakerRec <= 16 ? 16 : (breakerRec <= 20 ? 20 : (breakerRec <= 32 ? 32 : Math.ceil(breakerRec / 10) * 10)));
+
+    var btuHr = totalMaxW * 3.412142;
+    var tonsCooling = btuHr / 12000;
+
+    var totalWeightKg = totalCabinets * cabWt;
+    var totalWeightLbs = totalWeightKg * 2.20462;
+    var weightSqm = screenAreaSqm > 0 ? (totalWeightKg / screenAreaSqm) : 0;
+
+    $('totPowerMax').textContent = fmt(totalMaxKW, 2) + " kW";
+    $('powerPerSqm').textContent = fmt(pwrPerSqmMax, 0) + " W/m² peak";
+    $('totPowerAvg').textContent = fmt(totalAvgKW, 2) + " kW";
+    $('powerAvgSqm').textContent = fmt(pwrPerSqmAvg, 0) + " W/m² avg";
+
+    $('currentDraw').textContent = fmt(currentAmps, 1) + " A (" + voltage + "V)";
+    $('breakerRec').textContent = "Recommended Breaker: " + breakerRating + "A Circuit";
+    $('heatBTU').textContent = fmtNum(btuHr) + " BTU/hr";
+    $('heatTons').textContent = fmt(tonsCooling, 2) + " Tons AC Cooling Req.";
+
+    $('totWeight').textContent = fmt(totalWeightKg, 1) + " kg";
+    $('totWeightLbs').textContent = fmt(totalWeightLbs, 1) + " lbs (" + totalCabinets + " Cabs)";
+    $('weightPerSqm').textContent = fmt(weightSqm, 1) + " kg/m²";
+
+    // --- Update Technical Matrix Table Live Column ---
+    $('tComp').textContent = $('pixelComp').value;
+    $('tPitch').textContent = fmt(pitch, 4);
+    $('tCabRes').textContent = cabDotsW + "×" + cabDotsH;
+    $('tModRes').textContent = Math.round(cabDotsW / 2) + "×" + Math.round(cabDotsH / 2);
+    $('tDensity').textContent = fmtNum(density);
+    $('tCabSize').textContent = cabW + "×" + cabH + "×31";
+    $('tCabMat').textContent = $('cabMaterial').value;
+    $('tCabWt').textContent = fmt(cabWt, 1) + "±0.1";
+
+    $('tBitDepth').textContent = $('colorDepth').value;
+    $('tContrast').textContent = $('contrast').value;
+    $('tRefresh').textContent = fmtNum(parseFloat($('refreshRate').value));
+    $('tDrive').textContent = $('driveMode').value;
+    $('tBright').textContent = fmtNum(parseFloat($('brightness').value));
+    $('tTemp').textContent = fmtNum(parseFloat($('colorTemp').value));
+    $('tViewAng').textContent = $('viewAngle').value;
+
+    $('tVoltage').textContent = "AC100~240";
+    $('tFreq').textContent = $('acFreq').value;
+    $('tPwrUnitMax').textContent = fmt(pwrMaxUnit, 0);
+    $('tPwrUnitAvg').textContent = fmt(pwrAvgUnit, 0);
+    $('tPwrSqmMax').textContent = fmt(pwrPerSqmMax, 0);
+    $('tPwrSqmAvg').textContent = fmt(pwrPerSqmAvg, 0);
+
+    // --- Render Interactive SVG Wall Preview ---
+    renderSvgWall(cols, rows, cabW, cabH, totalDotsW, totalDotsH, screenWidthM, screenHeightM, aspectText, wallDiagInches);
+  }
+
+  // SVG Wall Graphic Renderer
+  function renderSvgWall(cols, rows, cabW, cabH, dotsW, dotsH, widthM, heightM, aspectStr, diagInches) {
+    var maxW = 460, maxH = 135;
+    var wallRatio = (cols * cabW) / (rows * cabH);
+    var targetW, targetH;
+
+    if (wallRatio >= (maxW / maxH)) {
+      targetW = maxW;
+      targetH = maxW / wallRatio;
+    } else {
+      targetH = maxH;
+      targetW = maxH * wallRatio;
+    }
+
+    var cabPixW = targetW / cols;
+    var cabPixH = targetH / rows;
+
+    var svgHtml = '<svg class="screen-svg" viewBox="0 0 ' + (targetW + 30) + ' ' + (targetH + 30) + '" xmlns="http://www.w3.org/2000/svg">';
+    // Outer display bezel
+    svgHtml += '<rect x="15" y="5" width="' + targetW + '" height="' + targetH + '" rx="4" fill="var(--surface-sub)" stroke="var(--ink)" stroke-width="2"/>';
+
+    // Grid of cabinets
+    for (var r = 0; r < rows; r++) {
+      for (var c = 0; c < cols; c++) {
+        var x = 15 + c * cabPixW;
+        var y = 5 + r * cabPixH;
+        svgHtml += '<rect x="' + x + '" y="' + y + '" width="' + cabPixW + '" height="' + cabPixH + '" fill="none" stroke="var(--line)" stroke-width="0.75"/>';
+      }
+    }
+
+    // Dimension indicators
+    // Width Line
+    svgHtml += '<line x1="15" y1="' + (targetH + 18) + '" x2="' + (targetW + 15) + '" y2="' + (targetH + 18) + '" stroke="var(--accent)" stroke-width="1.5"/>';
+    svgHtml += '<text x="' + (targetW / 2 + 15) + '" y="' + (targetH + 28) + '" font-family="var(--font-num)" font-size="10" fill="var(--ink)" text-anchor="middle" font-weight="600">' + fmt(widthM, 2) + 'm (' + cols + ' cabs) &bull; ' + fmtNum(dotsW) + ' px</text>';
+
+    // Height Line
+    svgHtml += '<line x1="5" y1="5" x2="5" y2="' + (targetH + 5) + '" stroke="var(--accent)" stroke-width="1.5"/>';
+    svgHtml += '<text transform="rotate(-90 4 ' + (targetH / 2 + 5) + ')" x="4" y="' + (targetH / 2 + 5) + '" font-family="var(--font-num)" font-size="9" fill="var(--ink)" text-anchor="middle" font-weight="600">' + fmt(heightM, 2) + 'm</text>';
+
+    // Center Watermark / Aspect Ratio Stamp
+    svgHtml += '<rect x="' + (targetW / 2 - 48 + 15) + '" y="' + (targetH / 2 - 12 + 5) + '" width="96" height="24" rx="4" fill="var(--surface)" fill-opacity="0.92" stroke="var(--line)"/>';
+    svgHtml += '<text x="' + (targetW / 2 + 15) + '" y="' + (targetH / 2 + 4 + 5) + '" font-family="var(--font-num)" font-size="10" font-weight="700" fill="var(--accent)" text-anchor="middle">' + fmt(diagInches, 0) + '″ (' + aspectStr + ')</text>';
+
+    svgHtml += '</svg>';
+    $('svgContainer').innerHTML = svgHtml;
+  }
+
+  // --- Aspect Ratio Wall Presets ---
+  function applyWallPreset(presetKey) {
+    var cabW = parseFloat($('cabWidth').value) || 600;
+    var cabH = parseFloat($('cabHeight').value) || 337.5;
+    var cabRatio = cabW / cabH; // Typically 16:9 = 1.7778
+
+    if (presetKey === '16-9-FHD') {
+      $('cols').value = 4;
+      $('rows').value = 4;
+      if (Math.abs(cabRatio - 1.7778) > 0.05) {
+        $('cols').value = 8;
+        $('rows').value = 4;
+      }
+    } else if (presetKey === '16-9-4K') {
+      $('cols').value = 8;
+      $('rows').value = 8;
+      if (Math.abs(cabRatio - 1.7778) > 0.05) {
+        $('cols').value = 16;
+        $('rows').value = 9;
+      }
+    } else if (presetKey === '21-9') {
+      $('cols').value = 7;
+      $('rows').value = 3;
+    } else if (presetKey === '32-9') {
+      $('cols').value = 10;
+      $('rows').value = 3;
+    } else if (presetKey === '4-3') {
+      $('cols').value = 4;
+      $('rows').value = 3;
+    }
+    recalc();
+  }
+
+  // --- Copy Technical Specs Table as Text ---
+  function copyTableText() {
+    var table = $('specTable');
+    var rows = table.querySelectorAll('tr');
+    var textLines = [];
+
+    rows.forEach(function(row) {
+      var cells = row.querySelectorAll('th, td');
+      var rowText = [];
+      cells.forEach(function(cell) {
+        rowText.push(cell.innerText.trim());
+      });
+      textLines.push(rowText.join('\t'));
+    });
+
+    var fullText = textLines.join('\n');
+    navigator.clipboard.writeText(fullText).then(function() {
+      var btn = $('btnCopyTable');
+      var original = btn.innerHTML;
+      btn.innerHTML = '✓ Copied Specs!';
+      setTimeout(function() { btn.innerHTML = original; }, 2000);
+    }).catch(function() {
+      alert('Copied to clipboard!');
+    });
+  }
+
+  // --- Theme Toggle Setup ---
+  var themeToggle = $('themeToggle');
+  var currentTheme = localStorage.getItem('led_tool_theme') || 'auto';
+
+  function setTheme(t) {
+    if (t === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      $('themeIcon').textContent = '☀️';
+      $('themeText').textContent = 'Light Mode';
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+      $('themeIcon').textContent = '🌙';
+      $('themeText').textContent = 'Dark Mode';
+    }
+    localStorage.setItem('led_tool_theme', t);
+  }
+
+  themeToggle.addEventListener('click', function() {
+    var cur = document.documentElement.getAttribute('data-theme') || 'light';
+    setTheme(cur === 'dark' ? 'light' : 'dark');
+  });
+
+  // --- Global Delegated Event for Up/Down Stepper Buttons ---
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.step-btn');
+    if (!btn) return;
+    var wrap = btn.closest('.input-wrap');
+    if (!wrap) return;
+    var input = wrap.querySelector('input');
+    if (!input) return;
+
+    var step = parseFloat(input.step) || 1;
+    var val = parseFloat(input.value) || 0;
+    var min = input.min !== '' ? parseFloat(input.min) : -Infinity;
+    var max = input.max !== '' ? parseFloat(input.max) : Infinity;
+
+    if (btn.classList.contains('up')) {
+      val = Math.min(max, val + step);
+    } else if (btn.classList.contains('down')) {
+      val = Math.max(min, val - step);
+    }
+
+    var decimals = 0;
+    if (input.step && input.step.indexOf('.') > -1) {
+      decimals = input.step.split('.')[1].length;
+    }
+    input.value = decimals > 0 ? val.toFixed(decimals) : val;
+
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+
+  // --- Event Listeners Setup ---
+  // Special 136-inch AIO Preset Button
+  $('btnPresetAIO136').addEventListener('click', applyAIO136Preset);
+
+  // Model Preset Chips
+  var modelChips = document.querySelectorAll('#modelChips .chip[data-model]');
+  modelChips.forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      $('btnPresetAIO136').classList.remove('active');
+      loadModel(chip.getAttribute('data-model'));
+    });
+  });
+
+  // Pitch Preset Chips
+  var pitchChips = document.querySelectorAll('#pitchChips .chip');
+  pitchChips.forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      var p = parseFloat(chip.getAttribute('data-p'));
+      $('pitch').value = p;
+      $('roomDistance').value = fmt(p, 1); // Sync audience distance!
+      recalc();
+    });
+  });
+
+  // Aspect Ratio Preset Chips
+  var wallPresets = document.querySelectorAll('[data-preset-wall]');
+  wallPresets.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      applyWallPreset(btn.getAttribute('data-preset-wall'));
+    });
+  });
+
+  // Diagonal Preset Chips
+  var diagChips = document.querySelectorAll('#diagChips .chip');
+  diagChips.forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      var d = parseFloat(chip.getAttribute('data-diag'));
+      $('screenDiagonal').value = d;
+      diagChips.forEach(function(c) { c.classList.toggle('active', c === chip); });
+      recalc();
+    });
+  });
+
+  // Indoor / Outdoor Switch
+  $('btnIndoor').addEventListener('click', function() { setEnv('indoor'); });
+  $('btnOutdoor').addEventListener('click', function() { setEnv('outdoor'); });
+
+  // Sizing Mode Switch (Cabinets, Custom Size, Diagonal)
+  $('modeCabinets').addEventListener('click', function() { setSizingMode('cabinets'); });
+  $('modeCustomSize').addEventListener('click', function() { setSizingMode('custom'); });
+  $('modeDiagonal').addEventListener('click', function() { setSizingMode('diagonal'); });
+
+  // When Pitch is manually edited, keep distance synced unless user overrides
+  $('pitch').addEventListener('input', function() {
+    var p = parseFloat(this.value);
+    if (p > 0) {
+      $('roomDistance').value = fmt(p, 1);
+    }
+  });
+
+  // Inputs live binding
+  var liveInputs = [
+    'pitch', 'cabWidth', 'cabHeight', 'cabWeight', 'cols', 'rows',
+    'wallWidth', 'wallHeight', 'screenDiagonal', 'diagAspect', 'brightness',
+    'contrast', 'refreshRate', 'colorDepth', 'viewAngle', 'colorTemp',
+    'driveMode', 'pixelComp', 'powerMax', 'powerAvg', 'acVoltage', 'acFreq',
+    'cabMaterial', 'roomDistance'
+  ];
+
+  liveInputs.forEach(function(id) {
+    var el = $(id);
+    if (el) {
+      el.addEventListener('input', recalc);
+      el.addEventListener('change', recalc);
+    }
+  });
+
+  $('btnCopyTable').addEventListener('click', copyTableText);
+
+  // Initialize
+  if (currentTheme !== 'auto') {
+    setTheme(currentTheme);
+  }
+  loadModel('FM2709');
+})();
+</script>
+
+</body>
+</html>
